@@ -4,9 +4,13 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestInfo(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	server := NewServer(sconfig, NewTestingStorage())
 	resp := server.NewResponse()
@@ -18,8 +22,8 @@ func TestInfo(t *testing.T) {
 	req.Form = make(url.Values)
 	req.Form.Set("code", "9999")
 
-	if ar := server.HandleInfoRequest(resp, req); ar != nil {
-		server.FinishInfoRequest(resp, req, ar)
+	if ar := server.HandleInfoRequest(c, resp, req); ar != nil {
+		server.FinishInfoRequest(c, resp, req, ar)
 	}
 
 	if resp.IsError && resp.InternalError != nil {
@@ -40,6 +44,8 @@ func TestInfo(t *testing.T) {
 }
 
 func TestInfoWhenCodeIsOnHeader(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	server := NewServer(sconfig, NewTestingStorage())
 	resp := server.NewResponse()
@@ -50,8 +56,8 @@ func TestInfoWhenCodeIsOnHeader(t *testing.T) {
 	}
 	req.Header.Set("Authorization", "Bearer 9999")
 
-	if ar := server.HandleInfoRequest(resp, req); ar != nil {
-		server.FinishInfoRequest(resp, req, ar)
+	if ar := server.HandleInfoRequest(c, resp, req); ar != nil {
+		server.FinishInfoRequest(c, resp, req, ar)
 	}
 
 	if resp.IsError && resp.InternalError != nil {

@@ -1,6 +1,8 @@
 package osin
 
-import ()
+import (
+	"golang.org/x/net/context"
+)
 
 // Storage interface
 type Storage interface {
@@ -14,36 +16,36 @@ type Storage interface {
 	Close()
 
 	// GetClient loads the client by id (client_id)
-	GetClient(id string) (Client, error)
+	GetClient(c context.Context, id string) (Client, error)
 
 	// SaveAuthorize saves authorize data.
-	SaveAuthorize(*AuthorizeData) error
+	SaveAuthorize(c context.Context, data *AuthorizeData) error
 
 	// LoadAuthorize looks up AuthorizeData by a code.
 	// Client information MUST be loaded together.
 	// Optionally can return error if expired.
-	LoadAuthorize(code string) (*AuthorizeData, error)
+	LoadAuthorize(c context.Context, code string) (*AuthorizeData, error)
 
 	// RemoveAuthorize revokes or deletes the authorization code.
-	RemoveAuthorize(code string) error
+	RemoveAuthorize(c context.Context, code string) error
 
 	// SaveAccess writes AccessData.
 	// If RefreshToken is not blank, it must save in a way that can be loaded using LoadRefresh.
-	SaveAccess(*AccessData) error
+	SaveAccess(c context.Context, data *AccessData) error
 
 	// LoadAccess retrieves access data by token. Client information MUST be loaded together.
 	// AuthorizeData and AccessData DON'T NEED to be loaded if not easily available.
 	// Optionally can return error if expired.
-	LoadAccess(token string) (*AccessData, error)
+	LoadAccess(c context.Context, token string) (*AccessData, error)
 
 	// RemoveAccess revokes or deletes an AccessData.
-	RemoveAccess(token string) error
+	RemoveAccess(c context.Context, token string) error
 
 	// LoadRefresh retrieves refresh AccessData. Client information MUST be loaded together.
 	// AuthorizeData and AccessData DON'T NEED to be loaded if not easily available.
 	// Optionally can return error if expired.
-	LoadRefresh(token string) (*AccessData, error)
+	LoadRefresh(c context.Context, token string) (*AccessData, error)
 
 	// RemoveRefresh revokes or deletes refresh AccessData.
-	RemoveRefresh(token string) error
+	RemoveRefresh(c context.Context, token string) error
 }

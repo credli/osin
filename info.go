@@ -3,6 +3,8 @@ package osin
 import (
 	"net/http"
 	"time"
+
+	"golang.org/x/net/context"
 )
 
 // InfoRequest is a request for information about some AccessData
@@ -13,7 +15,7 @@ type InfoRequest struct {
 
 // HandleInfoRequest is an http.HandlerFunc for server information
 // NOT an RFC specification.
-func (s *Server) HandleInfoRequest(w *Response, r *http.Request) *InfoRequest {
+func (s *Server) HandleInfoRequest(c context.Context, w *Response, r *http.Request) *InfoRequest {
 	r.ParseForm()
 	bearer := CheckBearerAuth(r)
 	if bearer == nil {
@@ -34,7 +36,7 @@ func (s *Server) HandleInfoRequest(w *Response, r *http.Request) *InfoRequest {
 	var err error
 
 	// load access data
-	ret.AccessData, err = w.Storage.LoadAccess(ret.Code)
+	ret.AccessData, err = w.Storage.LoadAccess(c, ret.Code)
 	if err != nil {
 		w.SetError(E_INVALID_REQUEST, "")
 		w.InternalError = err
@@ -61,7 +63,7 @@ func (s *Server) HandleInfoRequest(w *Response, r *http.Request) *InfoRequest {
 }
 
 // FinishInfoRequest finalizes the request handled by HandleInfoRequest
-func (s *Server) FinishInfoRequest(w *Response, r *http.Request, ir *InfoRequest) {
+func (s *Server) FinishInfoRequest(c context.Context, w *Response, r *http.Request, ir *InfoRequest) {
 	// don't process if is already an error
 	if w.IsError {
 		return

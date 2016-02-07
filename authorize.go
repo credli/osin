@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"golang.org/x/net/context"
 )
 
 // AuthorizeRequestType is the type for OAuth param `response_type`
@@ -85,7 +87,7 @@ type AuthorizeTokenGen interface {
 
 // HandleAuthorizeRequest is the main http.HandlerFunc for handling
 // authorization requests
-func (s *Server) HandleAuthorizeRequest(w *Response, r *http.Request) *AuthorizeRequest {
+func (s *Server) HandleAuthorizeRequest(c context.Context, w *Response, r *http.Request) *AuthorizeRequest {
 	r.ParseForm()
 
 	// create the authorization request
@@ -105,7 +107,7 @@ func (s *Server) HandleAuthorizeRequest(w *Response, r *http.Request) *Authorize
 	}
 
 	// must have a valid client
-	ret.Client, err = w.Storage.GetClient(r.Form.Get("client_id"))
+	ret.Client, err = w.Storage.GetClient(c, r.Form.Get("client_id"))
 	if err != nil {
 		w.SetErrorState(E_SERVER_ERROR, "", ret.State)
 		w.InternalError = err
@@ -151,7 +153,7 @@ func (s *Server) HandleAuthorizeRequest(w *Response, r *http.Request) *Authorize
 	return nil
 }
 
-func (s *Server) FinishAuthorizeRequest(w *Response, r *http.Request, ar *AuthorizeRequest) {
+func (s *Server) FinishAuthorizeRequest(c context.Context, w *Response, r *http.Request, ar *AuthorizeRequest) {
 	// don't process if is already an error
 	if w.IsError {
 		return
@@ -177,7 +179,7 @@ func (s *Server) FinishAuthorizeRequest(w *Response, r *http.Request, ar *Author
 				UserData:        ar.UserData,
 			}
 
-			s.FinishAccessRequest(w, r, ret)
+			s.FinishAccessRequest(c, w, r, ret)
 			if ar.State != "" && w.InternalError == nil {
 				w.Output["state"] = ar.State
 			}
@@ -203,7 +205,7 @@ func (s *Server) FinishAuthorizeRequest(w *Response, r *http.Request, ar *Author
 			ret.Code = code
 
 			// save authorization token
-			if err = w.Storage.SaveAuthorize(ret); err != nil {
+			if err = w.Storage.SaveAuthorize(c, ret); err != nil {
 				w.SetErrorState(E_SERVER_ERROR, "", ar.State)
 				w.InternalError = err
 				return

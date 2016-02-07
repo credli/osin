@@ -4,9 +4,13 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestAuthorizeCode(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAuthorizeTypes = AllowedAuthorizeType{CODE}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -22,9 +26,9 @@ func TestAuthorizeCode(t *testing.T) {
 	req.Form.Set("client_id", "1234")
 	req.Form.Set("state", "a")
 
-	if ar := server.HandleAuthorizeRequest(resp, req); ar != nil {
+	if ar := server.HandleAuthorizeRequest(c, resp, req); ar != nil {
 		ar.Authorized = true
-		server.FinishAuthorizeRequest(resp, req, ar)
+		server.FinishAuthorizeRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)
@@ -47,6 +51,8 @@ func TestAuthorizeCode(t *testing.T) {
 }
 
 func TestAuthorizeToken(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAuthorizeTypes = AllowedAuthorizeType{TOKEN}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -63,9 +69,9 @@ func TestAuthorizeToken(t *testing.T) {
 	req.Form.Set("client_id", "1234")
 	req.Form.Set("state", "a")
 
-	if ar := server.HandleAuthorizeRequest(resp, req); ar != nil {
+	if ar := server.HandleAuthorizeRequest(c, resp, req); ar != nil {
 		ar.Authorized = true
-		server.FinishAuthorizeRequest(resp, req, ar)
+		server.FinishAuthorizeRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)

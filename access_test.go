@@ -4,9 +4,13 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func TestAccessAuthorizationCode(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAccessTypes = AllowedAccessType{AUTHORIZATION_CODE}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -25,9 +29,9 @@ func TestAccessAuthorizationCode(t *testing.T) {
 	req.Form.Set("state", "a")
 	req.PostForm = make(url.Values)
 
-	if ar := server.HandleAccessRequest(resp, req); ar != nil {
+	if ar := server.HandleAccessRequest(c, resp, req); ar != nil {
 		ar.Authorized = true
-		server.FinishAccessRequest(resp, req, ar)
+		server.FinishAccessRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)
@@ -54,6 +58,8 @@ func TestAccessAuthorizationCode(t *testing.T) {
 }
 
 func TestAccessRefreshToken(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAccessTypes = AllowedAccessType{REFRESH_TOKEN}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -72,9 +78,9 @@ func TestAccessRefreshToken(t *testing.T) {
 	req.Form.Set("state", "a")
 	req.PostForm = make(url.Values)
 
-	if ar := server.HandleAccessRequest(resp, req); ar != nil {
+	if ar := server.HandleAccessRequest(c, resp, req); ar != nil {
 		ar.Authorized = true
-		server.FinishAccessRequest(resp, req, ar)
+		server.FinishAccessRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)
@@ -101,6 +107,8 @@ func TestAccessRefreshToken(t *testing.T) {
 }
 
 func TestAccessPassword(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAccessTypes = AllowedAccessType{PASSWORD}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -120,9 +128,9 @@ func TestAccessPassword(t *testing.T) {
 	req.Form.Set("state", "a")
 	req.PostForm = make(url.Values)
 
-	if ar := server.HandleAccessRequest(resp, req); ar != nil {
+	if ar := server.HandleAccessRequest(c, resp, req); ar != nil {
 		ar.Authorized = ar.Username == "testing" && ar.Password == "testing"
-		server.FinishAccessRequest(resp, req, ar)
+		server.FinishAccessRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)
@@ -149,6 +157,8 @@ func TestAccessPassword(t *testing.T) {
 }
 
 func TestAccessClientCredentials(t *testing.T) {
+	c := context.Background()
+
 	sconfig := NewServerConfig()
 	sconfig.AllowedAccessTypes = AllowedAccessType{CLIENT_CREDENTIALS}
 	server := NewServer(sconfig, NewTestingStorage())
@@ -166,9 +176,9 @@ func TestAccessClientCredentials(t *testing.T) {
 	req.Form.Set("state", "a")
 	req.PostForm = make(url.Values)
 
-	if ar := server.HandleAccessRequest(resp, req); ar != nil {
+	if ar := server.HandleAccessRequest(c, resp, req); ar != nil {
 		ar.Authorized = true
-		server.FinishAccessRequest(resp, req, ar)
+		server.FinishAccessRequest(c, resp, req, ar)
 	}
 
 	//fmt.Printf("%+v", resp)

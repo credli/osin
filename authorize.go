@@ -62,7 +62,7 @@ type AuthorizeData struct {
 	CreatedAt time.Time
 
 	// Data to be passed to storage. Not used by the library.
-	UserData interface{} `datastore:"-"`
+	UserData interface{}
 }
 
 // IsExpired is true if authorization expired

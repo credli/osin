@@ -20,7 +20,7 @@ type DefaultClient struct {
 	Id          string
 	Secret      string
 	RedirectUri string
-	UserData    interface{} `datastore:"-"`
+	UserData    interface{}
 }
 
 func (d *DefaultClient) GetId() string {

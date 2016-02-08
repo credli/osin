@@ -84,7 +84,7 @@ type AccessData struct {
 	CreatedAt time.Time
 
 	// Data to be passed to storage. Not used by the library.
-	UserData interface{}
+	UserData interface{} `datastore:"-"`
 }
 
 // IsExpired returns true if access expired

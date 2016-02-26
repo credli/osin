@@ -4,6 +4,8 @@ import (
 	"encoding/base64"
 	"strings"
 
+	"golang.org/x/net/context"
+
 	"github.com/pborman/uuid"
 )
 
@@ -16,7 +18,7 @@ func removePadding(token string) string {
 }
 
 // GenerateAuthorizeToken generates a base64-encoded UUID code
-func (a *AuthorizeTokenGenDefault) GenerateAuthorizeToken(data *AuthorizeData) (ret string, err error) {
+func (a *AuthorizeTokenGenDefault) GenerateAuthorizeToken(c context.Context, data *AuthorizeData) (ret string, err error) {
 	token := uuid.NewRandom()
 	return removePadding(base64.URLEncoding.EncodeToString([]byte(token))), nil
 }
@@ -26,7 +28,7 @@ type AccessTokenGenDefault struct {
 }
 
 // GenerateAccessToken generates base64-encoded UUID access and refresh tokens
-func (a *AccessTokenGenDefault) GenerateAccessToken(data *AccessData, generaterefresh bool) (accesstoken string, refreshtoken string, err error) {
+func (a *AccessTokenGenDefault) GenerateAccessToken(c context.Context, data *AccessData, generaterefresh bool) (accesstoken string, refreshtoken string, err error) {
 	token := uuid.NewRandom()
 	accesstoken = removePadding(base64.URLEncoding.EncodeToString([]byte(token)))
 

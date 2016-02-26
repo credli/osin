@@ -82,7 +82,7 @@ func (d *AuthorizeData) ExpireAt() time.Time {
 
 // AuthorizeTokenGen is the token generator interface
 type AuthorizeTokenGen interface {
-	GenerateAuthorizeToken(data *AuthorizeData) (string, error)
+	GenerateAuthorizeToken(c context.Context, data *AuthorizeData) (string, error)
 }
 
 // HandleAuthorizeRequest is the main http.HandlerFunc for handling
@@ -196,7 +196,7 @@ func (s *Server) FinishAuthorizeRequest(c context.Context, w *Response, r *http.
 			}
 
 			// generate token code
-			code, err := s.AuthorizeTokenGen.GenerateAuthorizeToken(ret)
+			code, err := s.AuthorizeTokenGen.GenerateAuthorizeToken(c, ret)
 			if err != nil {
 				w.SetErrorState(E_SERVER_ERROR, "", ar.State)
 				w.InternalError = err

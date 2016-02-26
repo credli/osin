@@ -104,7 +104,7 @@ func (d *AccessData) ExpireAt() time.Time {
 
 // AccessTokenGen generates access tokens
 type AccessTokenGen interface {
-	GenerateAccessToken(data *AccessData, generaterefresh bool) (accesstoken string, refreshtoken string, err error)
+	GenerateAccessToken(c context.Context, data *AccessData, generaterefresh bool) (accesstoken string, refreshtoken string, err error)
 }
 
 // HandleAccessRequest is the http.HandlerFunc for handling access token requests
@@ -452,7 +452,7 @@ func (s *Server) FinishAccessRequest(c context.Context, w *Response, r *http.Req
 			}
 
 			// generate access token
-			ret.AccessToken, ret.RefreshToken, err = s.AccessTokenGen.GenerateAccessToken(ret, ar.GenerateRefresh)
+			ret.AccessToken, ret.RefreshToken, err = s.AccessTokenGen.GenerateAccessToken(c, ret, ar.GenerateRefresh)
 			if err != nil {
 				w.SetError(E_SERVER_ERROR, "")
 				w.InternalError = err
